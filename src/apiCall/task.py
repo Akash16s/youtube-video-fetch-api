@@ -3,11 +3,10 @@ from threading import Thread
 from celery import shared_task
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
 from apiCall.models import youtubeModel
 
 
-# To check whether the key is not exhausted
+# This function checks whether the key is not exhausted
 def checkKey(key):
     youtubeAPI = build('youtube', 'v3', developerKey=key)
     req = youtubeAPI.search().list(q='cricket',
@@ -26,7 +25,7 @@ def checkKey(key):
 
 
 def saveTheFigures(items):
-    # it saves the results in the database
+    # This function saves the results in the database
     for i in items:
         youtubeModel.objects.create(
             video_title=i['snippet']['title'],
@@ -36,10 +35,10 @@ def saveTheFigures(items):
         )
 
 
-# This is a celery task for getting the youtube results
+# Function is a celery task for getting the youtube results
 @shared_task
 def getTheYoutubeResultsSave(apiKey, nextPageToken=None):
-    # Creating youtubeAPI object with the api key
+    # Creating youtubeAPI object with the apikey
     youtubeAPI = build('youtube', 'v3', developerKey=apiKey)
 
     # NextPageToken is for having the next possible results

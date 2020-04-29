@@ -19,4 +19,5 @@ application = get_wsgi_application()
 # this is simple method to fetch the youtube api details by having a thread in start
 # this can be done using a celery task running in background
 obj = youtube()
+# This is the thread call for the function that calls the youtube API at every 10 seconds
 Thread(target=obj.saveResults, args=()).start()

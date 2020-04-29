@@ -1,8 +1,10 @@
 # youtube-video-fetch-api
-The ideology is:
+The ideology:
 1. Start a parallel process to get the apiKey and keep 10 seconds timer
 2. At every 10 seconds the Celery task is called to execute the task(Currently it is complex to setup the celery so I just
 added the thread to it).
+3. At start of call the API Key is verified for the exhaustion.
+4. Then a async call is made to save the data.
 
 # Files
 Key Files:
@@ -10,10 +12,10 @@ Key Files:
 1. src/apiCall/task.py
 2. src/apiCall/youtube.py
 3. src/youtube/celery.py
-4. src/apiCall/   {API Folder}
+4. src/apiCall/   [API Folder]
 ```
 
-# Functionality Covered
+# Functionality Covered here
 ```buildoutcfg
 - Server call the YouTube API continuously in background (async) with some interval (say 10 seconds)
 - fetch the latest videos for a predefined search query 
@@ -22,28 +24,26 @@ Key Files:
 - It should be scalable and optimised.
 - Added support for supplying multiple API keys so that if quota is exhausted on one, it automatically uses the next available key.
 ```
-# Instructions to start server
-1 Create virtualenv: 
+# Instructions to start django server on localhost
+1- Create virtualenv: 
 ```buildoutcfg
 cd src
 virtualenv venv
 ```
-
-2 Install required packages
-
+2- Install required packages
 ```buildoutcfg
 pip install -r requirements.txt
 ```
-3 Makemigrations, migrate
+3- Makemigrations, migrate
 ```buildoutcfg
 python manage.py makemigrations
 python manage.py migrate
 ```
-4 Createsuperuser
+4- Createsuperuser
 ```
 python manage.py createsuperuser
 ```
-5 Runserver
+5- Runserver
 ```buildoutcfg
 python manage.py runserver
 ```
@@ -52,7 +52,7 @@ python manage.py runserver
 ```buildoutcfg
 http://127.0.0.1:8000/youtube/
 ```
-GET Request will return data in following json:
+GET Request will return data in following json with datetime order:
  ```buildoutcfg
 {
     "count": 62,
@@ -83,4 +83,4 @@ GET Request will return data in following json:
     ]
 }
 ```
-The API is query capable and paginated.
+### The API is query capable and paginated.

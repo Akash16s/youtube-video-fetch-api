@@ -33,10 +33,13 @@ class youtube:
 
             # It checks whether the key is not exhausted
             if checkKey(self._currentKey):
-                Thread(target=getTheYoutubeResultsSave, args=(self._currentKey,)).start()  # Create a thread to
                 # execute the task
 
-                # getTheYoutubeResultsSave.delay(self._currentKey) # Start a celery process
+                # Create a thread to Start a celery process
+                Thread(target=getTheYoutubeResultsSave, args=(self._currentKey,)).start()
+
+                # getTheYoutubeResultsSave.delay(self._currentKey)
+                # Currently the Celery can be implemented easily but the task of setup will be quite complex
             else:
                 try:
                     self.nextKey()
