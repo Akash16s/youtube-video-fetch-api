@@ -12,8 +12,8 @@ class apiKeysModel(models.Model):
 class youtubeModel(models.Model):
     video_title = models.TextField(null=False, blank=False)
     description = models.TextField(null=False, blank=False)
-    publish_datetime = models.DateField(null=False, blank=False)
-    thumbnail_url = models.URLField(max_length=300)
+    publish_datetime = models.DateTimeField(null=False, blank=False)
+    thumbnail_url = models.TextField()
 
     def __str__(self):
         return self.video_title

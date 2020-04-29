@@ -1,19 +1,21 @@
-from datetime import datetime
-from googleapiclient.errors import HttpError
-from apiCall.models import apiKeysModel, youtubeModel
-from googleapiclient.discovery import build
+from threading import Thread
+from apiCall.models import apiKeysModel
 import time
+from apiCall.task import getTheYoutubeResultsSave, checkKey
 
 
+# This class helps in key management and calling the task
 class youtube:
     def __init__(self):
         self._allKey = apiKeysModel.objects.all().order_by("pk")
         self._currentKeyIndex = 0
         self._currentKey = self._allKey[self._currentKeyIndex].key
 
+    # Get the current running key
     def getKey(self):
         return self._currentKey
 
+    # fetching the next possible key
     def nextKey(self):
         self._currentKeyIndex += 1
 
@@ -24,49 +26,21 @@ class youtube:
 
         return self
 
-    def getTheResults(self, nextPageKey=None):
-        youtubeAPI = build('youtube', 'v3', developerKey=self._currentKey)
-        if nextPageKey is not None:
-            req = youtubeAPI.search().list(q='avengers',
-                                           part='snippet',
-                                           type='video',
-                                           order='date',
-                                           pageToken=nextPageKey,
-                                           publishedAfter=datetime.utcfromtimestamp(
-                                               (datetime.now().timestamp()) - 10000).
-                                           strftime("%Y-%m-%dT%H:%M:%S.0Z"))
-        else:
-            req = youtubeAPI.search().list(q='avengers',
-                                           part='snippet',
-                                           type='video',
-                                           order='date',
-                                           pageToken=nextPageKey,
-                                           publishedAfter=datetime.utcfromtimestamp((datetime.now().timestamp()) - 10).
-                                           strftime("%Y-%m-%dT%H:%M:%S.0Z"))
-
-        try:
-            res = req.execute()
-        except HttpError:
-
-            try:
-                self.nextKey()
-                return self.getTheResults(nextPageKey)
-            except:
-                return None
-
-        return res
-
-    # def saveTheResults(self, dict):
-    #     for i in dict:
-
+    # Start running the process and fetch details
     def saveResults(self):
-        nextPageKey = None
         while True:
-            print(nextPageKey)
-            time.sleep(10)
-            res = self.getTheResults(nextPageKey)
-            nextPageKey = res['nextPageToken']
-            print(res)
-            if res is None:
-                break
+            time.sleep(10)  # 10 Seconds delay
+
+            # It checks whether the key is not exhausted
+            if checkKey(self._currentKey):
+                Thread(target=getTheYoutubeResultsSave, args=(self._currentKey,)).start()  # Create a thread to
+                # execute the task
+
+                # getTheYoutubeResultsSave.delay(self._currentKey) # Start a celery process
+            else:
+                try:
+                    self.nextKey()
+                except:
+                    # It breaks when all the key is exhausted
+                    break
         print("The API KEYS are exhausted")
