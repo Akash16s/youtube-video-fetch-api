@@ -2,7 +2,7 @@ amqp==2.5.2
 asgiref==3.2.7
 billiard==3.5.0.5
 cachetools==4.1.0
-celery==4.1.1
+celery==5.2.2
 certifi==2020.4.5.1
 chardet==3.0.4
 discovery==0.0.4
